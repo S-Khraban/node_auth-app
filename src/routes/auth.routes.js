@@ -1,6 +1,7 @@
 import { Router } from 'express';
 
 import { authController } from '../controllers/auth.controller.js';
+import { authMiddleware } from '../middlewares/auth.middleware.js';
 import { guestMiddleware } from '../middlewares/guest.middleware.js';
 import { validate } from '../middlewares/validate.middleware.js';
 import { authValidators } from '../validators/auth.validators.js';
@@ -37,6 +38,6 @@ router.post(
   authController.resetConfirm,
 );
 
-router.post('/logout', authController.logout);
+router.post('/logout', authMiddleware, authController.logout);
 
 export default router;
