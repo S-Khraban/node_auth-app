@@ -1,19 +1,25 @@
-import { createApp } from './app.js';
-import { env } from './config/env.js';
-import { sequelize } from './config/db.js';
-import './models/index.js';
+import express from 'express';
+import cookieParser from 'cookie-parser';
 
-async function startServer() {
-  try {
-    await sequelize.authenticate();
-    await sequelize.sync();
+import routes from './routes/index.js';
+import { authOpt } from './middlewares/authOpt.middleware.js';
+import { notFoundMiddleware } from './middlewares/notFound.middleware.js';
+import { errorMiddleware } from './middlewares/error.middleware.js';
 
-    const app = createApp();
+export function createApp() {
+  const app = express();
 
-    app.listen(env.PORT);
-  } catch (error) {
-    process.exit(1);
-  }
+  app.disable('x-powered-by');
+
+  app.use(express.json());
+  app.use(cookieParser());
+
+  app.use(authOpt);
+
+  app.use('/', routes);
+
+  app.use(notFoundMiddleware);
+  app.use(errorMiddleware);
+
+  return app;
 }
-
-startServer();
